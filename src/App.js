@@ -1,24 +1,41 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+import ShowList from "./components/ShowsList";
+import ShowSummary from "./components/ShowSummary";
+import BookingForm from "./components/BookingForm";
+import Header from "./components/Header/Header";
+import Footer from "./components/Footer/Footer";
 
 function App() {
+  const [shows, setShows] = useState([]);
+
+  useEffect(() => {
+    const fetchShows = async () => {
+      try {
+        const response = await axios.get(
+          "https://api.tvmaze.com/search/shows?q=all"
+        );
+        setShows(response.data);
+      } catch (error) {
+        console.log("Error fetching shows:", error);
+      }
+    };
+
+    fetchShows();
+  }, []);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <div>
+        <Header />
+        <Routes>
+          <Route path="/" element={<ShowList shows={shows} />} />
+          <Route path="/summary/:showId" element={<ShowSummary />} />
+        </Routes>
+        <Footer />
+      </div>
+    </Router>
   );
 }
 
